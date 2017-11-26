@@ -1,9 +1,4 @@
 source("convert.R")
-#source("package.R")
-
-#packages <- c("shiny", "rgdal")
-#ipak(packages)
-
 library(shiny)
 library(rgdal)
 
@@ -13,19 +8,10 @@ shinyServer(function(input,output) {
       if (is.null(inFile)){
         return(NULL)
       }
-    test<-read.csv(inFile$datapath)
-    table = convert(test)
+    df <- read.csv(inFile$datapath)
+    table = convert(df)
     
   })
-  
-  output$texto<-renderPrint({
-      str1 <- ("<h3>fila 1</h3>")
-      tr2 <- ("<h3>fila 2</h3>")
-      str3 <- ("<h3>fila 3</h3>")
-      str4 <- ("<h3>fila 4</h3>")
-      str5 <- ("<h3>fila 5</h3>")
-      HTML(paste(str1, str2,str3,str4,str5, sep = '<br/>'))
-    })
   
   output$contents <- renderTable(digits=6,getData()) 
   
