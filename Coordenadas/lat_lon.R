@@ -1,15 +1,24 @@
-processing_xy <- function(d, df){
+source("x_y.R")
+
+processing_lat.lot <- function(d, df){
   
-  coordinates(d) <- c("LON", "LAT")
-  proj4string(d) <- CRS("+init=epsg:32161") # NAD83 PR& V. IS
-  CRS.new <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ++towgs84=0,0,0") #WGS84
-  d.wgs84 <- spTransform(d, CRS.new)
+  d1 = d
+  colnames(d1) = c("X", "Y")
+  coordinates(d1) <- c("X", "Y")
+  proj4string(d1) <- CRS("+init=epsg:32161") 
+  CRS.original <- CRS("+init=epsg:32161")
+  d.wgs84 <- spTransform(d1, CRS.original)
   BG<-readOGR(dsn=".",layer="BG2010")
-  proj4string(BG)<-CRS.new
+  proj4string(BG)<-CRS.original
   join2 <- (over(d.wgs84, BG[,c("TRACTCE10", "NAMELSAD10","GEOID10" )]))
-  
-  table<-cbind(df$ID,df$X, df$Y, as.data.frame(d.wgs84), as.data.frame(join2))
+
+  coordinates(d) <- c("X", "Y")
+  proj4string(d) <- CRS("+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs ++towgs84=0,0,0")
+  CRS.new <- CRS("+init=epsg:32161") #nad83
+  d.nad83 <- spTransform(d, CRS.new)
+  table<-cbind(df$ID, as.data.frame(d.nad83), df$LON, df$LAT, as.data.frame(join2))
   colnames(table) = c("ID","X","Y","Longitud","Latitud","Tract Census", "Block Group", "Geo ID")
   
   return(table)
+  
 }
